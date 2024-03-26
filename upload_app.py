@@ -79,7 +79,7 @@ class SlackManager:
                 self._curr_bar = SlackProgressBar(
                     self.token, self.user_id, self._curr_total
                 )
-                self._curr_bar.update(value)
+            self._curr_bar.update(value)
 
 
 class UploadApp:
