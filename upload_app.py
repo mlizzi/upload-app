@@ -1,15 +1,14 @@
 import os
 import time
 
-import redis
+import requests
 
 from slack_progress_bar import SlackProgressBar
 
 USER_0 = os.getenv("USER_0")
 USER_1 = os.getenv("USER_1")
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
-REDIS_PASSWORD = os.getenv("REDIS_PASSWORD")
+API_HOST = os.getenv("API_HOST", "localhost")
 
 
 class SlackManager:
@@ -26,9 +25,6 @@ class SlackManager:
         """
         self.token = token
         self.user_id = user_id
-        self.redis = redis.Redis(
-            host=REDIS_HOST, password=REDIS_PASSWORD, decode_responses=True
-        )
 
         self._curr_bar = None
         self._curr_total = 0
@@ -42,15 +38,13 @@ class SlackManager:
         bool
             If the user is subscribed or not.
         """
-        key = f"{self.user_id}:subscribed"
-
-        # Assume user is
-        if (val := self.redis.get(key)) is None:
-            print("Subscription not found. Default to subscribed.")
-            self.redis.set(key, 1)
-            return True
-
-        return bool(int(val))
+        return bool(
+            int(
+                requests.get(
+                    f"http://{API_HOST}:5000/subscribed?user_id={user_id}"
+                ).text
+            )
+        )
 
     def new_bar(self, total: int) -> None:
         """Create a new progress bar on Slack.
