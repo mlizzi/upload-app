@@ -32,10 +32,12 @@ def subscribed() -> str:
     """Unsubscribe to getting progress bar updates on Slack."""
     key = f"{request.args.get('user_id')}:subscribed"
 
-    if key not in database:
-        database.set(key, 1)
-
-    return database.get(key)
+    val = database.get(key)
+    if not val:
+        # If key not present, default new user to be subscribed
+        val = "1"
+        database.set(key, val)
+    return val
 
 
 if __name__ == "__main__":
