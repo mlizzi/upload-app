@@ -4,8 +4,12 @@ import redis
 from flask import Flask, request
 
 app = Flask(__name__)
+
+# Use env variable to find redis host, default to localhost
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_PASSWORD = os.getenv("REDIS_PASSWORD")
 database = redis.Redis(
-    password=os.getenv("REDIS_PASSWORD"), decode_responses=True
+    host=REDIS_HOST, password=REDIS_PASSWORD, decode_responses=True
 )
 
 

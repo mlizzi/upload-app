@@ -8,7 +8,7 @@ from slack_progress_bar import SlackProgressBar
 USER_0 = os.getenv("USER_0")
 USER_1 = os.getenv("USER_1")
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-REDIS_HOST = os.getenv("REDIS_HOST")
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PASSWORD = os.getenv("REDIS_PASSWORD")
 
 
