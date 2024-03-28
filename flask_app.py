@@ -34,12 +34,10 @@ def unsubscribe() -> Tuple[Response, int]:
 def subscribed() -> Tuple[Response, int]:
     """Get subscription status of user."""
     key = f"{request.args.get('user_id')}:subscribed"
-    val = database.get(key)
 
     # If no subscription status for a user, default to subscribed
-    if val is None:
-        val = "1"
-        database.set(key, val)
+    val = database.get(key) or "1"
+
     return jsonify({"data": val}), 200
 
 
