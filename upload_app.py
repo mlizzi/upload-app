@@ -2,6 +2,7 @@ import os
 import time
 
 import requests
+from requests import RequestException
 
 from slack_progress_bar import SlackProgressBar
 
@@ -38,13 +39,16 @@ class SlackManager:
         bool
             If the user is subscribed or not.
         """
-        return bool(
-            int(
-                requests.get(
-                    f"http://{API_HOST}:5000/subscribed?user_id={user_id}"
-                ).text
+        url = f"http://{API_HOST}:5000/subscribed?user_id={self.user_id}"
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            return bool(int(response.json()["data"]))
+        else:
+            raise RequestException(
+                f"Error locating {url}. Ensure API is running and "
+                f"$API_HOST={API_HOST} is set correctly."
             )
-        )
 
     def new_bar(self, total: int) -> None:
         """Create a new progress bar on Slack.

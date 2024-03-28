@@ -1,43 +1,46 @@
 import os
+from typing import Tuple
 
 import redis
-from flask import Flask, request
+from flask import Flask, request, jsonify, Response
 
 app = Flask(__name__)
 
-# REDIS_HOST used in docker-compose to reference docker redis instance.
-# If running outside of docker, default to redis hosted at localhost.
+# REDIS_HOST env necessary when running app in docker.
+# If running app + redis locally, default to localhost
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 database = redis.Redis(host=REDIS_HOST, decode_responses=True)
 
 
 @app.route("/subscribe", methods=["POST"])
-def subscribe() -> str:
-    """Subscribe to getting progress bar updates on Slack."""
+def subscribe() -> Tuple[Response, int]:
+    """Save progress bar subscription to database."""
     user_id = request.form.to_dict()["user_id"]
     database.set(f"{user_id}:subscribed", 1)
-    return "Subscribed to messages!"
+
+    return jsonify({"text": "Subscribed!"}), 201
 
 
 @app.route("/unsubscribe", methods=["POST"])
-def unsubscribe() -> str:
-    """Unsubscribe to getting progress bar updates on Slack."""
+def unsubscribe() -> Tuple[Response, int]:
+    """Save progress bar unsubscribe to database."""
     user_id = request.form.to_dict()["user_id"]
     database.set(f"{user_id}:subscribed", 0)
-    return "Unsubscribed from messages!"
+
+    return jsonify({"text": "Unsubscribed!"}), 201
 
 
 @app.route("/subscribed", methods=["GET"])
-def subscribed() -> str:
-    """Unsubscribe to getting progress bar updates on Slack."""
+def subscribed() -> Tuple[Response, int]:
+    """Get subscription status of user."""
     key = f"{request.args.get('user_id')}:subscribed"
-
     val = database.get(key)
-    if not val:
-        # If key not present, default new user to be subscribed
+
+    # If no subscription status for a user, default to subscribed
+    if val is None:
         val = "1"
         database.set(key, val)
-    return val
+    return jsonify({"data": val}), 200
 
 
 if __name__ == "__main__":
