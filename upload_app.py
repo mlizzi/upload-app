@@ -58,11 +58,9 @@ class SlackManager:
         total
             The total size of the progress bar.
         """
-        if self.is_subscribed:
-            self._curr_bar = SlackProgressBar(self.token, self.user_id, total)
-        else:
-            self._curr_bar = None
-        self._curr_total = total
+        self._curr_bar = SlackProgressBar(
+            self.token, self.user_id, total, notify=self.is_subscribed
+        )
 
     def update_bar(self, value: int) -> None:
         """Update the current progress bar on Slack.
@@ -72,13 +70,8 @@ class SlackManager:
         value
             The value to set the progress bar.
         """
-        if self.is_subscribed:
-            if not self._curr_bar:
-                self._curr_bar = SlackProgressBar(
-                    self.token, self.user_id, self._curr_total, value=value
-                )
-            else:
-                self._curr_bar.update(value)
+        self._curr_bar.notify = self.is_subscribed
+        self._curr_bar.update(value)
 
 
 class UploadApp:

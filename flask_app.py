@@ -18,7 +18,7 @@ def subscribe() -> Tuple[Response, int]:
     user_id = request.form.to_dict()["user_id"]
     database.set(f"{user_id}:subscribed", 1)
 
-    return jsonify({"text": "Subscribed!"}), 201
+    return jsonify({"text": "Subscribed!"}), 200
 
 
 @app.route("/unsubscribe", methods=["POST"])
@@ -27,7 +27,7 @@ def unsubscribe() -> Tuple[Response, int]:
     user_id = request.form.to_dict()["user_id"]
     database.set(f"{user_id}:subscribed", 0)
 
-    return jsonify({"text": "Unsubscribed!"}), 201
+    return jsonify({"text": "Unsubscribed!"}), 200
 
 
 @app.route("/subscribed", methods=["GET"])
