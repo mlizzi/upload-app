@@ -75,9 +75,10 @@ class SlackManager:
         if self.is_subscribed:
             if not self._curr_bar:
                 self._curr_bar = SlackProgressBar(
-                    self.token, self.user_id, self._curr_total
+                    self.token, self.user_id, self._curr_total, value=value
                 )
-            self._curr_bar.update(value)
+            else:
+                self._curr_bar.update(value)
 
 
 class UploadApp:
